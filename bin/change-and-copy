@@ -1,0 +1,5 @@
+#!/usr/bin/env node
+
+var a = require("../dist/index.js");
+
+a.change_copy(process.cwd(), process.argv[2], process.argv[3]);
