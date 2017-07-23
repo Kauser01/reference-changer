@@ -8,12 +8,14 @@ var posixPath = path.posix;
 var FolderHandler = (function () {
     function FolderHandler() {
     }
-    FolderHandler.getFiles = function (dir, filelist) {
+    FolderHandler.getFiles = function (dir, source, filelist) {
+        if (source === void 0) { source = ""; }
         if (filelist === void 0) { filelist = []; }
         fs.readdirSync(dir).forEach(function (file) {
-            filelist = fs.statSync(posixPath.join(dir, file)).isDirectory()
-                ? config.exclude.indexOf(file) === -1
-                    ? FolderHandler.getFiles(posixPath.join(dir, file), filelist)
+            var filePath = posixPath.join(dir, file);
+            filelist = fs.statSync(filePath).isDirectory()
+                ? config.exclude.indexOf(file) === -1 && filePath !== source
+                    ? FolderHandler.getFiles(filePath, source, filelist)
                     : filelist
                 : filelist.concat(new FileHandler_1.FileHandler(posixPath.join(dir, file)));
         });

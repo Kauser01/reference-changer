@@ -27,7 +27,7 @@ export default class ReferenceChanger {
         // Check if source is file or folder and does it exists
         // Test to check it is not updating general content like index.ts
         try {
-            this.searchFilesList = FolderHandler.getFiles(this.resource);
+            this.searchFilesList = FolderHandler.getFiles(this.resource, this.source);
             if (fs.statSync(this.source).isDirectory()) {
                 this.targetFilesList = FolderHandler.getFiles(this.source);
             } else {

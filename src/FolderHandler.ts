@@ -7,11 +7,12 @@ let config = require("../common/config");
 let posixPath = path.posix;
 
 export default class FolderHandler {
-    public static getFiles = (dir: string, filelist: IFileHandler[] = []): IFileHandler[] => {
+    public static getFiles = (dir: string, source: string = "", filelist: IFileHandler[] = []): IFileHandler[] => {
         fs.readdirSync(dir).forEach(file => {
-            filelist = fs.statSync(posixPath.join(dir, file)).isDirectory()
-                ? config.exclude.indexOf(file) === -1
-                    ? FolderHandler.getFiles(posixPath.join(dir, file), filelist)
+            let filePath = posixPath.join(dir, file);
+            filelist = fs.statSync(filePath).isDirectory()
+                ? config.exclude.indexOf(file) === -1 && filePath !== source
+                    ? FolderHandler.getFiles(filePath, source, filelist)
                     : filelist
                 : filelist.concat(new FileHandler(posixPath.join(dir, file)));
 

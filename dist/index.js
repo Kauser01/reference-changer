@@ -19,7 +19,7 @@ var ReferenceChanger = (function () {
             // Check if source is file or folder and does it exists
             // Test to check it is not updating general content like index.ts
             try {
-                _this.searchFilesList = FolderHandler_1.default.getFiles(_this.resource);
+                _this.searchFilesList = FolderHandler_1.default.getFiles(_this.resource, _this.source);
                 if (fs.statSync(_this.source).isDirectory()) {
                     _this.targetFilesList = FolderHandler_1.default.getFiles(_this.source);
                 }
