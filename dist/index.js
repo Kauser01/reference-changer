@@ -39,6 +39,9 @@ var ReferenceChanger = (function () {
                 console.log("Copying the files");
                 fs_extra.copySync(_this.source, _this.destination);
                 console.log("Content copied successfully");
+                console.log("Remove initial directory/folder");
+                fs_extra.removeSync(_this.source);
+                console.log("Successfully deleted older content");
                 process.exit(0);
             }
             catch (e) {
