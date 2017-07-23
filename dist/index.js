@@ -20,7 +20,12 @@ var ReferenceChanger = (function () {
             // Test to check it is not updating general content like index.ts
             try {
                 _this.searchFilesList = FolderHandler_1.default.getFiles(_this.resource);
-                _this.targetFilesList = [new FileHandler_1.FileHandler(_this.source)];
+                if (fs.statSync(_this.source).isDirectory()) {
+                    _this.targetFilesList = FolderHandler_1.default.getFiles(_this.source);
+                }
+                else {
+                    _this.targetFilesList = [new FileHandler_1.FileHandler(_this.source)];
+                }
                 _this.searchFilesList.forEach(function (file) {
                     _this.targetFilesList.forEach(function (targetFile) {
                         var fileContent = file.getFileContent();
@@ -57,10 +62,6 @@ var ReferenceChanger = (function () {
             this.source = posixPath.join(this.resource, this.source);
         if (!posixPath.isAbsolute(this.destination))
             this.destination = posixPath.join(this.resource, this.destination);
-        if (fs.statSync(this.source).isDirectory()) {
-            console.log("Currently we are not supporting folder copy");
-            process.exit(-1);
-        }
     }
     return ReferenceChanger;
 }());

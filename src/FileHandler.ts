@@ -57,23 +57,29 @@ export class FileHandler implements IFileHandler {
                 if (currentTargetPath[0] != '.') {
                     currentTargetPath = "./" + currentTargetPath;
                 }
+                if (posixPath.extname(name)) {
+                    currentTargetPath += posixPath.extname(name);
+                }
                 this._fileContent = this._fileContent.substring(0, startingIndex + 1) + currentTargetPath + this._fileContent.substring(endingIndex);
-                return;
-            } else {
-                return;
             }
         }
     }
 
+    private getPosition(name: string, count: number): number {
+        return this._fileContent.split(name, count).join(name).length;
+    }
+
     public updateFileContent(currentTargetPath: string, source: string, destination: string, name: string): void {
-        let regex = new RegExp(name, "gi");
-        let result, indices = [];
-        while ((result = regex.exec(this._fileContent))) {
-            indices.push(result.index);
+        let count = 1;
+        let position = 0;
+        while (position < this._fileContent.length) {
+            position = this.getPosition(name, count);
+            if (position === this._fileContent.length) {
+                break;
+            }
+            this.updateRefernceAt(position, currentTargetPath, source, destination, name);
+            count++;
         }
-        indices.forEach(index => {
-            this.updateRefernceAt(index, currentTargetPath, source, destination, name);
-        })
     }
 
     public saveFile(): void {

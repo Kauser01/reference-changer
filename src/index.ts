@@ -20,10 +20,6 @@ export default class ReferenceChanger {
             this.source = posixPath.join(this.resource, this.source);
         if (!posixPath.isAbsolute(this.destination))
             this.destination = posixPath.join(this.resource, this.destination);
-        if (fs.statSync(this.source).isDirectory()) {
-            console.log(`Currently we are not supporting folder copy`);
-            process.exit(-1);
-        }
 
     }
 
@@ -32,7 +28,11 @@ export default class ReferenceChanger {
         // Test to check it is not updating general content like index.ts
         try {
             this.searchFilesList = FolderHandler.getFiles(this.resource);
-            this.targetFilesList = [new FileHandler(this.source)];
+            if (fs.statSync(this.source).isDirectory()) {
+                this.targetFilesList = FolderHandler.getFiles(this.source);
+            } else {
+                this.targetFilesList = [new FileHandler(this.source)];
+            }
             this.searchFilesList.forEach(file => {
                 this.targetFilesList.forEach(targetFile => {
                     let fileContent = file.getFileContent();

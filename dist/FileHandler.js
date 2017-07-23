@@ -44,24 +44,27 @@ var FileHandler = (function () {
                 if (currentTargetPath[0] != '.') {
                     currentTargetPath = "./" + currentTargetPath;
                 }
+                if (posixPath.extname(name)) {
+                    currentTargetPath += posixPath.extname(name);
+                }
                 this._fileContent = this._fileContent.substring(0, startingIndex + 1) + currentTargetPath + this._fileContent.substring(endingIndex);
-                return;
-            }
-            else {
-                return;
             }
         }
     };
+    FileHandler.prototype.getPosition = function (name, count) {
+        return this._fileContent.split(name, count).join(name).length;
+    };
     FileHandler.prototype.updateFileContent = function (currentTargetPath, source, destination, name) {
-        var _this = this;
-        var regex = new RegExp(name, "gi");
-        var result, indices = [];
-        while ((result = regex.exec(this._fileContent))) {
-            indices.push(result.index);
+        var count = 1;
+        var position = 0;
+        while (position < this._fileContent.length) {
+            position = this.getPosition(name, count);
+            if (position === this._fileContent.length) {
+                break;
+            }
+            this.updateRefernceAt(position, currentTargetPath, source, destination, name);
+            count++;
         }
-        indices.forEach(function (index) {
-            _this.updateRefernceAt(index, currentTargetPath, source, destination, name);
-        });
     };
     FileHandler.prototype.saveFile = function () {
         fs.writeFileSync(this._filePath, this._fileContent);
