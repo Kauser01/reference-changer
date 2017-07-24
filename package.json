@@ -1,16 +1,27 @@
 {
   "name": "reference-changer",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "description": "Change reference when relocating a file or folder",
+  "main": "./dist/index.js",
+  "scripts": {},
   "bin": {
     "change-and-copy": "./bin/change-and-copy"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "reference",
+    "change",
+    "copy",
+    "files",
+    "folder",
+    "auto-change",
+    "directory",
+    "restructure",
+    "relocate"
+  ],
+  "author": {
+    "email": "jagapathi.126@gmail.com",
+    "name": "Jagapathi Seemakurthy"
+  },
   "license": "ISC",
   "dependencies": {
     "fs-extra": "^4.0.0"
@@ -18,5 +29,9 @@
   "devDependencies": {
     "@types/fs-extra": "^4.0.0",
     "@types/node": "^8.0.15"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Jagapathi126/reference-changer"
   }
 }
