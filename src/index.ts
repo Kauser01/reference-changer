@@ -27,12 +27,16 @@ export default class ReferenceChanger {
         // Check if source is file or folder and does it exists
         // Test to check it is not updating general content like index.ts
         try {
+            console.log(`Fetching folders to search for reference changes`);
             this.searchFilesList = FolderHandler.getFiles(this.resource, this.source);
+            console.log(`Getting target files whose reference needs to be changed in search files list`);
             if (fs.statSync(this.source).isDirectory()) {
                 this.targetFilesList = FolderHandler.getFiles(this.source);
             } else {
                 this.targetFilesList = [new FileHandler(this.source)];
             }
+
+            console.log(`Replacing target file references in search files`);
             this.searchFilesList.forEach(file => {
                 this.targetFilesList.forEach(targetFile => {
                     let fileContent = file.getFileContent();
@@ -43,6 +47,23 @@ export default class ReferenceChanger {
                     name = targetFile.nameWithOutExtension();
                     if (fileContent.indexOf(name) > -1) {
                         file.updateFileContent(targetFile.filePath(), this.source, this.destination, name);
+                    }
+                });
+                file.saveFile();
+            });
+
+            console.log(`Replacing search file references in target files`);
+
+            this.targetFilesList.forEach(file => {
+                this.searchFilesList.forEach(searchFile => {
+                    let fileContent = file.getFileContent();
+                    let name = searchFile.nameWithExtension();
+                    if (fileContent.indexOf(name) > -1) {
+                        file.updateTargetFileContent(searchFile.filePath(), this.source, this.destination, name);
+                    }
+                    name = searchFile.nameWithOutExtension();
+                    if (fileContent.indexOf(name) > -1) {
+                        file.updateTargetFileContent(searchFile.filePath(), this.source, this.destination, name);
                     }
                 });
                 file.saveFile();

@@ -19,13 +19,16 @@ var ReferenceChanger = (function () {
             // Check if source is file or folder and does it exists
             // Test to check it is not updating general content like index.ts
             try {
+                console.log("Fetching folders to search for reference changes");
                 _this.searchFilesList = FolderHandler_1.default.getFiles(_this.resource, _this.source);
+                console.log("Getting target files whose reference needs to be changed in search files list");
                 if (fs.statSync(_this.source).isDirectory()) {
                     _this.targetFilesList = FolderHandler_1.default.getFiles(_this.source);
                 }
                 else {
                     _this.targetFilesList = [new FileHandler_1.FileHandler(_this.source)];
                 }
+                console.log("Replacing target file references in search files");
                 _this.searchFilesList.forEach(function (file) {
                     _this.targetFilesList.forEach(function (targetFile) {
                         var fileContent = file.getFileContent();
@@ -36,6 +39,21 @@ var ReferenceChanger = (function () {
                         name = targetFile.nameWithOutExtension();
                         if (fileContent.indexOf(name) > -1) {
                             file.updateFileContent(targetFile.filePath(), _this.source, _this.destination, name);
+                        }
+                    });
+                    file.saveFile();
+                });
+                console.log("Replacing search file references in target files");
+                _this.targetFilesList.forEach(function (file) {
+                    _this.searchFilesList.forEach(function (searchFile) {
+                        var fileContent = file.getFileContent();
+                        var name = searchFile.nameWithExtension();
+                        if (fileContent.indexOf(name) > -1) {
+                            file.updateTargetFileContent(searchFile.filePath(), _this.source, _this.destination, name);
+                        }
+                        name = searchFile.nameWithOutExtension();
+                        if (fileContent.indexOf(name) > -1) {
+                            file.updateTargetFileContent(searchFile.filePath(), _this.source, _this.destination, name);
                         }
                     });
                     file.saveFile();
