@@ -2,7 +2,7 @@
 
 [![build-image]][build-url]
 
-`Reference change` is a command-line utility that helps moving of folders/files from one location to another. Advantage of using this is, it automatically change the references in the repository
+`Reference changer` is a command-line utility that helps in moving folders/files from one location to another. It automatically changes the references in the project repository
 
 # Install
 
@@ -27,7 +27,7 @@ Move folder from one location to another
 ```
 refernce-changer ./path/to/folder ./destination/path/to/folder
 ```
-<sub><sup>*Note: This command should be run from root directory of project to replace all the reference in the project</sup></sub>
+<sub><sup>*Note: To change all the references in the project, run this command from root directory of that project.</sup></sub>
 
 # Details
 
@@ -42,10 +42,8 @@ typings
 .idea
 ```
 
-## Enhancements
-- Accept a configuration to accept exclude list.
-- Accept a configuration to accept include list to avoid default excludes.
-
+## Upcoming enhancement
+- Include/exclude list of folders/files from user provided configuration.
 
 [build-image]: https://travis-ci.org/Jagapathi126/reference-changer.svg?branch=master
 [build-url]: https://github.com/Jagapathi126/reference-changer
