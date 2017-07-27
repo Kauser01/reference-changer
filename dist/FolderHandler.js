@@ -13,11 +13,15 @@ var FolderHandler = (function () {
         if (filelist === void 0) { filelist = []; }
         fs.readdirSync(dir).forEach(function (file) {
             var filePath = posixPath.join(dir, file);
+            var nameWithoutExtension = file.replace(posixPath.extname(file), "");
+            var fileExtension = posixPath.extname(file).toLowerCase();
             filelist = fs.statSync(filePath).isDirectory()
                 ? config.exclude.indexOf(file) === -1 && filePath !== source
                     ? FolderHandler.getFiles(filePath, source, filelist)
                     : filelist
-                : filelist.concat(new FileHandler_1.FileHandler(posixPath.join(dir, file)));
+                : config.includedFileTypes.indexOf(fileExtension) > -1
+                    ? filelist.concat(new FileHandler_1.FileHandler(filePath))
+                    : filelist;
         });
         return filelist;
     };

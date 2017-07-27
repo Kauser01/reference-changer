@@ -6,5 +6,31 @@
         ".git",
         ".idea"
     ],
-    "include": []
+    "include": [],
+    "includedFileTypes": [
+        ".ts",
+        ".js",
+        ".java",
+        ".c",
+        ".cpp",
+        ".json",
+        ".txt",
+        ".doc",
+        ".docx",
+        ".log",
+        ".xml",
+        ".html",
+        ".php",
+        ".jsp",
+        ".htm",
+        ".asp",
+        ".aspx",
+        ".class",
+        ".cpp",
+        ".cs",
+        ".h",
+        ".pl",
+        ".py",
+        ".vb"
+    ]
 }

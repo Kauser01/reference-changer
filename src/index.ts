@@ -48,6 +48,12 @@ export default class ReferenceChanger {
                     if (fileContent.indexOf(name) > -1) {
                         file.updateFileContent(targetFile.filePath(), this.source, this.destination, name);
                     }
+                    let filePathComponents = file.filePath().split("/");
+                    let folderName = filePathComponents[filePathComponents.length - 2];
+                    if (name === "index" && fileContent.indexOf(folderName) > -1) {
+                        let filePath = targetFile.filePath().replace(targetFile.nameWithExtension(), "");
+                        file.updateFileContent(filePath, this.source, this.destination, folderName);
+                    }
                 });
                 file.saveFile();
             });
@@ -64,6 +70,12 @@ export default class ReferenceChanger {
                     name = searchFile.nameWithOutExtension();
                     if (fileContent.indexOf(name) > -1) {
                         file.updateTargetFileContent(searchFile.filePath(), this.source, this.destination, name);
+                    }
+                    let filePathComponents = file.filePath().split("/");
+                    let folderName = filePathComponents[filePathComponents.length - 2];
+                    if (name === "index" && fileContent.indexOf(folderName) > -1) {
+                        let filePath = searchFile.filePath().replace(searchFile.nameWithExtension(), "");
+                        file.updateTargetFileContent(filePath, this.source, this.destination, folderName);
                     }
                 });
                 file.saveFile();

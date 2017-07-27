@@ -40,6 +40,12 @@ var ReferenceChanger = (function () {
                         if (fileContent.indexOf(name) > -1) {
                             file.updateFileContent(targetFile.filePath(), _this.source, _this.destination, name);
                         }
+                        var filePathComponents = file.filePath().split("/");
+                        var folderName = filePathComponents[filePathComponents.length - 2];
+                        if (name === "index" && fileContent.indexOf(folderName) > -1) {
+                            var filePath = targetFile.filePath().replace(targetFile.nameWithExtension(), "");
+                            file.updateFileContent(filePath, _this.source, _this.destination, folderName);
+                        }
                     });
                     file.saveFile();
                 });
@@ -54,6 +60,12 @@ var ReferenceChanger = (function () {
                         name = searchFile.nameWithOutExtension();
                         if (fileContent.indexOf(name) > -1) {
                             file.updateTargetFileContent(searchFile.filePath(), _this.source, _this.destination, name);
+                        }
+                        var filePathComponents = file.filePath().split("/");
+                        var folderName = filePathComponents[filePathComponents.length - 2];
+                        if (name === "index" && fileContent.indexOf(folderName) > -1) {
+                            var filePath = searchFile.filePath().replace(searchFile.nameWithExtension(), "");
+                            file.updateTargetFileContent(filePath, _this.source, _this.destination, folderName);
                         }
                     });
                     file.saveFile();

@@ -1,5 +1,4 @@
 node_modules/
 typings/
-.vscode
 **.*.map
 npm-debug.log
