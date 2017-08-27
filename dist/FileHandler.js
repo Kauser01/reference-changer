@@ -25,62 +25,6 @@ var FileHandler = (function () {
             this._fileContent = fs.readFileSync(this._filePath, "utf8");
         return this._fileContent;
     };
-    FileHandler.prototype.getPossibleNameFormats = function (searchFilePath) {
-        var possibleFormat = [];
-        possibleFormat.push({
-            isFile: true,
-            searchString: this.nameWithExtension(),
-            actualPath: this.filePath()
-        });
-        possibleFormat.push({
-            isFile: true,
-            searchString: this.nameWithOutExtension(),
-            actualPath: this.filePath()
-        });
-        if (this.nameWithOutExtension() === "index") {
-            var folderStack = this._filePath.split('/');
-            possibleFormat.push({
-                isFile: false,
-                searchString: folderStack[folderStack.length - 2],
-                actualPath: this.filePath()
-            });
-            var currentFilePathWithoutName = this.filePath().replace(this.nameWithExtension(), '');
-            var targetFilePathWithoutName = searchFilePath.substring(0, searchFilePath.lastIndexOf('/'));
-            var relativePath = posixPath.relative(targetFilePathWithoutName, currentFilePathWithoutName);
-            possibleFormat.push({
-                isFile: false,
-                searchString: relativePath ? "./" + relativePath : './',
-                actualPath: this.filePath()
-            });
-            if (relativePath.match('/$')) {
-                possibleFormat.push({
-                    isFile: false,
-                    searchString: "./" + relativePath.substring(0, relativePath.length - 1),
-                    actualPath: this.filePath()
-                });
-            }
-            else if (relativePath !== '/' && relativePath !== '') {
-                possibleFormat.push({
-                    isFile: false,
-                    searchString: "./" + relativePath + "/",
-                    actualPath: this.filePath()
-                });
-            }
-            if (relativePath.match('^..')) {
-                possibleFormat.push({
-                    isFile: false,
-                    searchString: relativePath,
-                    actualPath: this.filePath()
-                });
-                possibleFormat.push({
-                    isFile: false,
-                    searchString: relativePath + "/",
-                    actualPath: this.filePath()
-                });
-            }
-        }
-        return possibleFormat;
-    };
     FileHandler.prototype.isValidReference = function (index, currentTargetPath, name) {
         var endingIndex = index + name.length;
         if (this._fileContent[endingIndex] === "'"

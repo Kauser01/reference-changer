@@ -40,7 +40,7 @@ export default class ReferenceChanger {
         let sourceFinalPath = sourceFile.filePath().replace(this.source, '');
         sourceFinalPath = this.destination + sourceFinalPath;
         this.targetFilesList.forEach(targetFile => {
-          const possibleFormats = targetFile.getPossibleNameFormats(sourceFile.filePath());
+          const possibleFormats = Utilities.getPossibleNameFormats(targetFile, sourceFile.filePath());
           possibleFormats.forEach(format => {
             format.replaceString = Utilities.getReplaceString(sourceFinalPath, targetFile.filePath(), format);
             sourceFile.updateFileContent(format);
@@ -55,7 +55,7 @@ export default class ReferenceChanger {
         this.sourceFilesList.forEach(sourceFile => {
           let sourceFinalPath = sourceFile.filePath().replace(this.source, '');
           sourceFinalPath = this.destination + sourceFinalPath;
-          const possibleFormats = sourceFile.getPossibleNameFormats(targetFile.filePath());
+          const possibleFormats = Utilities.getPossibleNameFormats(sourceFile, targetFile.filePath());
           possibleFormats.forEach(format => {
             format.replaceString = Utilities.getReplaceString(targetFile.filePath(), sourceFinalPath, format);
             targetFile.updateFileContent(format);

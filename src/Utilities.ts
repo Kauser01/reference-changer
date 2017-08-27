@@ -1,10 +1,67 @@
 import * as path from 'path';
 
-import { PossibleFormat } from './FileHandler';
+import { PossibleFormat, IFileHandler } from './FileHandler';
 
 const posixPath = path.posix;
 
 export default class Utilities {
+  public static getPossibleNameFormats(targetFile: IFileHandler, searchFilePath: string): PossibleFormat[] {
+    let possibleFormat: PossibleFormat[] = [];
+    possibleFormat.push(<PossibleFormat>{
+      isFile: true,
+      searchString: targetFile.nameWithExtension(),
+      actualPath: targetFile.filePath()
+    });
+    possibleFormat.push(<PossibleFormat>{
+      isFile: true,
+      searchString: targetFile.nameWithOutExtension(),
+      actualPath: targetFile.filePath()
+    });
+    if (targetFile.nameWithOutExtension() === "index") {
+      const folderStack = targetFile.filePath().split('/');
+      possibleFormat.push(<PossibleFormat>{
+        isFile: false,
+        searchString: folderStack[folderStack.length - 2],
+        actualPath: targetFile.filePath()
+      });
+      const currentFilePathWithoutName = targetFile.filePath().replace(targetFile.nameWithExtension(), '');
+      const targetFilePathWithoutName = searchFilePath.substring(0, searchFilePath.lastIndexOf('/'));
+
+      const relativePath = posixPath.relative(targetFilePathWithoutName, currentFilePathWithoutName);
+      possibleFormat.push(<PossibleFormat>{
+        isFile: false,
+        searchString: relativePath ? `./${relativePath}` : './',
+        actualPath: targetFile.filePath()
+      });
+      if (relativePath.match('/$')) {
+        possibleFormat.push(<PossibleFormat>{
+          isFile: false,
+          searchString: "./" + relativePath.substring(0, relativePath.length - 1),
+          actualPath: targetFile.filePath()
+        });
+      } else if (relativePath !== '/' && relativePath !== '') {
+        possibleFormat.push(<PossibleFormat>{
+          isFile: false,
+          searchString: `./${relativePath}/`,
+          actualPath: targetFile.filePath()
+        });
+      }
+      if (relativePath.match('^..')) {
+        possibleFormat.push(<PossibleFormat>{
+          isFile: false,
+          searchString: relativePath,
+          actualPath: targetFile.filePath()
+        });
+        possibleFormat.push(<PossibleFormat>{
+          isFile: false,
+          searchString: `${relativePath}/`,
+          actualPath: targetFile.filePath()
+        });
+      }
+    }
+    return possibleFormat;
+  }
+
   public static getReplaceString(replaceIn: string, replaceWith: string, format: PossibleFormat) {
     let sourceLocation = replaceIn.substr(0, replaceIn.lastIndexOf("/"));
     let destinationLocation = replaceWith.substr(0, replaceWith.lastIndexOf("/"));

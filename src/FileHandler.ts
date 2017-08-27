@@ -20,7 +20,8 @@ export interface PossibleFormat {
 
 export interface IFileHandler {
   filePath(): string;
-  getPossibleNameFormats(searchFilePath: string): PossibleFormat[];
+  nameWithExtension(): string;
+  nameWithOutExtension():string;
   getFileContent(): string;
   updateFileContent(format: PossibleFormat): void;
   saveFile(): void;
@@ -38,11 +39,11 @@ export class FileHandler implements IFileHandler {
     return this._filePath;
   }
 
-  private nameWithExtension(): string {
+  public nameWithExtension(): string {
     return posixPath.basename(this._filePath);
   }
 
-  private nameWithOutExtension(): string {
+  public nameWithOutExtension(): string {
     let extension = posixPath.extname(this._filePath);
     return posixPath.basename(this._filePath).replace(extension, "");
   }
@@ -51,63 +52,6 @@ export class FileHandler implements IFileHandler {
     if (!this._fileContent)
       this._fileContent = fs.readFileSync(this._filePath, "utf8");
     return this._fileContent;
-  }
-
-  public getPossibleNameFormats(searchFilePath: string): PossibleFormat[] {
-    let possibleFormat: PossibleFormat[] = [];
-    possibleFormat.push(<PossibleFormat>{
-      isFile: true,
-      searchString: this.nameWithExtension(),
-      actualPath: this.filePath()
-    });
-    possibleFormat.push(<PossibleFormat>{
-      isFile: true,
-      searchString: this.nameWithOutExtension(),
-      actualPath: this.filePath()
-    });
-    if (this.nameWithOutExtension() === "index") {
-      const folderStack = this._filePath.split('/');
-      possibleFormat.push(<PossibleFormat>{
-        isFile: false,
-        searchString: folderStack[folderStack.length - 2],
-        actualPath: this.filePath()
-      });
-      const currentFilePathWithoutName = this.filePath().replace(this.nameWithExtension(), '');
-      const targetFilePathWithoutName = searchFilePath.substring(0, searchFilePath.lastIndexOf('/'));
-
-      const relativePath = posixPath.relative(targetFilePathWithoutName, currentFilePathWithoutName);
-      possibleFormat.push(<PossibleFormat>{
-        isFile: false,
-        searchString: relativePath ? `./${relativePath}` : './',
-        actualPath: this.filePath()
-      });
-      if (relativePath.match('/$')) {
-        possibleFormat.push(<PossibleFormat>{
-          isFile: false,
-          searchString: "./" + relativePath.substring(0, relativePath.length - 1),
-          actualPath: this.filePath()
-        });
-      } else if (relativePath !== '/' && relativePath !== '') {
-        possibleFormat.push(<PossibleFormat>{
-          isFile: false,
-          searchString: `./${relativePath}/`,
-          actualPath: this.filePath()
-        });
-      }
-      if (relativePath.match('^..')) {
-        possibleFormat.push(<PossibleFormat>{
-          isFile: false,
-          searchString: relativePath,
-          actualPath: this.filePath()
-        });
-        possibleFormat.push(<PossibleFormat>{
-          isFile: false,
-          searchString: `${relativePath}/`,
-          actualPath: this.filePath()
-        });
-      }
-    }
-    return possibleFormat;
   }
 
   private isValidReference(index: number, currentTargetPath: string, name: string): ValidationOutput {

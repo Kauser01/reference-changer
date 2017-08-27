@@ -31,7 +31,7 @@ var ReferenceChanger = (function () {
                     var sourceFinalPath = sourceFile.filePath().replace(_this.source, '');
                     sourceFinalPath = _this.destination + sourceFinalPath;
                     _this.targetFilesList.forEach(function (targetFile) {
-                        var possibleFormats = targetFile.getPossibleNameFormats(sourceFile.filePath());
+                        var possibleFormats = Utilities_1.default.getPossibleNameFormats(targetFile, sourceFile.filePath());
                         possibleFormats.forEach(function (format) {
                             format.replaceString = Utilities_1.default.getReplaceString(sourceFinalPath, targetFile.filePath(), format);
                             sourceFile.updateFileContent(format);
@@ -45,7 +45,7 @@ var ReferenceChanger = (function () {
                     _this.sourceFilesList.forEach(function (sourceFile) {
                         var sourceFinalPath = sourceFile.filePath().replace(_this.source, '');
                         sourceFinalPath = _this.destination + sourceFinalPath;
-                        var possibleFormats = sourceFile.getPossibleNameFormats(targetFile.filePath());
+                        var possibleFormats = Utilities_1.default.getPossibleNameFormats(sourceFile, targetFile.filePath());
                         possibleFormats.forEach(function (format) {
                             format.replaceString = Utilities_1.default.getReplaceString(targetFile.filePath(), sourceFinalPath, format);
                             targetFile.updateFileContent(format);
