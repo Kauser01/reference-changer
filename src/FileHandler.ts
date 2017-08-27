@@ -1,7 +1,7 @@
-import * as winston from 'winston';
 import * as path from 'path';
 import * as fs from 'fs';
 
+import logger from './logger';
 let posixPath = path.posix;
 
 interface ValidationOutput {
@@ -21,7 +21,7 @@ export interface PossibleFormat {
 export interface IFileHandler {
   filePath(): string;
   nameWithExtension(): string;
-  nameWithOutExtension():string;
+  nameWithOutExtension(): string;
   getFileContent(): string;
   updateFileContent(format: PossibleFormat): void;
   saveFile(): void;
@@ -111,7 +111,7 @@ export class FileHandler implements IFileHandler {
       }
       const info = this.isValidReference(position, format.actualPath, format.searchString);
       if (info.isValid) {
-        winston.info(`Replacing ${info.replacingString} with ${format.replaceString}`);
+        logger.info(`Replacing ${info.replacingString} with ${format.replaceString}`);
         this._fileContent = this._fileContent.substring(0, info.startingIndex + 1) + format.replaceString + this._fileContent.substring(info.endingIndex);
         this.shouldSave = true;
       }
@@ -122,9 +122,9 @@ export class FileHandler implements IFileHandler {
   public saveFile(): void {
     if (this.shouldSave) {
       fs.writeFileSync(this._filePath, this._fileContent);
-      winston.info('File saved successfully');
+      logger.info('File saved successfully');
     } else {
-      winston.info('No need to save the file as no content updated');
+      logger.info('No need to save the file as no content updated');
     }
   }
 }

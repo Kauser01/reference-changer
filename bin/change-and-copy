@@ -1,6 +1,4 @@
 #!/usr/bin/env node
 
 var referenceChanger = require("../dist/index.js");
-var handler = new referenceChanger.default(process.cwd(), process.argv[2], process.argv[3]);
-handler.change_copy();
-// a.change_copy(process.cwd(), process.argv[2], process.argv[3]);
+referenceChanger.default(process.cwd(), process.argv[2], process.argv[3]);

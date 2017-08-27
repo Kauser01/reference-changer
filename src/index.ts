@@ -1,6 +1,8 @@
-import * as winston from 'winston';
 import ReferenceChanger from './ReferenceChanger';
- 
-let changer = new ReferenceChanger(process.cwd(), process.argv[2], process.argv[3]);
 
-changer.changeReference();
+const referenceChanger = (resource: string, source: string, destination: string) => {
+  const changer = new ReferenceChanger(resource, source, destination);
+  changer.changeReference();
+}
+
+export default referenceChanger;

@@ -1,7 +1,7 @@
 import fs = require("fs");
 import path = require("path");
 import fs_extra = require("fs-extra");
-import * as winston from 'winston';
+import logger from './logger';
 
 import { IFileHandler, FileHandler } from "./FileHandler";
 import FolderHandler from "./FolderHandler";
@@ -28,15 +28,15 @@ export default class ReferenceChanger {
   public changeReference = () => {
     try {
       if (!fs.existsSync(this.source)) {
-        winston.info(`Specified source ${this.source} doesn't exists`);
+        logger.info(`Specified source ${this.source} doesn't exists`);
         process.exit(1);
       }
-      winston.info(`Fetching files in source and target location`);
+      logger.info(`Fetching files in source and target location`);
       this.sourceFilesList = FolderHandler.getFilesList(this.source);
       this.targetFilesList = FolderHandler.getFilesList(this.resource, [this.source]);
-      winston.info(`Replacing target references in source files`);
+      logger.info(`Replacing target references in source files`);
       this.sourceFilesList.forEach(sourceFile => {
-        winston.info(`Working with file ${sourceFile.filePath()}`);
+        logger.info(`Working with file ${sourceFile.filePath()}`);
         let sourceFinalPath = sourceFile.filePath().replace(this.source, '');
         sourceFinalPath = this.destination + sourceFinalPath;
         this.targetFilesList.forEach(targetFile => {
@@ -49,9 +49,9 @@ export default class ReferenceChanger {
         sourceFile.saveFile();
       });
 
-      winston.info(`Replacing source references in target files`);
+      logger.info(`Replacing source references in target files`);
       this.targetFilesList.forEach(targetFile => {
-        winston.info(`Working with file ${targetFile.filePath()}`);
+        logger.info(`Working with file ${targetFile.filePath()}`);
         this.sourceFilesList.forEach(sourceFile => {
           let sourceFinalPath = sourceFile.filePath().replace(this.source, '');
           sourceFinalPath = this.destination + sourceFinalPath;
@@ -64,17 +64,17 @@ export default class ReferenceChanger {
         targetFile.saveFile();
       });
 
-      winston.info('References changed successfully');
-      winston.info('Moving the files');
+      logger.info('References changed successfully');
+      logger.info('Moving the files');
       fs_extra.copySync(this.source, this.destination);
-      winston.info('Files copied successfully');
-      winston.info('Deleting old files');
+      logger.info('Files copied successfully');
+      logger.info('Deleting old files');
       fs_extra.removeSync(this.source);
-      winston.info('Old files deleted successfully');
+      logger.info('Old files deleted successfully');
       process.exit(0);
     } catch (e) {
-      console.log(e);
-      console.log("Failed to process your request");
+      logger.error(e);
+      logger.error("Failed to process your request");
       process.exit(-1);
     }
   }

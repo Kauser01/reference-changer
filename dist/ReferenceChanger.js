@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var fs = require("fs");
 var path = require("path");
 var fs_extra = require("fs-extra");
-var winston = require("winston");
+var logger_1 = require("./logger");
 var FolderHandler_1 = require("./FolderHandler");
 var Utilities_1 = require("./Utilities");
 var config = require("../common/config");
@@ -19,15 +19,15 @@ var ReferenceChanger = (function () {
         this.changeReference = function () {
             try {
                 if (!fs.existsSync(_this.source)) {
-                    winston.info("Specified source " + _this.source + " doesn't exists");
+                    logger_1.default.info("Specified source " + _this.source + " doesn't exists");
                     process.exit(1);
                 }
-                winston.info("Fetching files in source and target location");
+                logger_1.default.info("Fetching files in source and target location");
                 _this.sourceFilesList = FolderHandler_1.default.getFilesList(_this.source);
                 _this.targetFilesList = FolderHandler_1.default.getFilesList(_this.resource, [_this.source]);
-                winston.info("Replacing target references in source files");
+                logger_1.default.info("Replacing target references in source files");
                 _this.sourceFilesList.forEach(function (sourceFile) {
-                    winston.info("Working with file " + sourceFile.filePath());
+                    logger_1.default.info("Working with file " + sourceFile.filePath());
                     var sourceFinalPath = sourceFile.filePath().replace(_this.source, '');
                     sourceFinalPath = _this.destination + sourceFinalPath;
                     _this.targetFilesList.forEach(function (targetFile) {
@@ -39,9 +39,9 @@ var ReferenceChanger = (function () {
                     });
                     sourceFile.saveFile();
                 });
-                winston.info("Replacing source references in target files");
+                logger_1.default.info("Replacing source references in target files");
                 _this.targetFilesList.forEach(function (targetFile) {
-                    winston.info("Working with file " + targetFile.filePath());
+                    logger_1.default.info("Working with file " + targetFile.filePath());
                     _this.sourceFilesList.forEach(function (sourceFile) {
                         var sourceFinalPath = sourceFile.filePath().replace(_this.source, '');
                         sourceFinalPath = _this.destination + sourceFinalPath;
@@ -53,18 +53,18 @@ var ReferenceChanger = (function () {
                     });
                     targetFile.saveFile();
                 });
-                winston.info('References changed successfully');
-                winston.info('Moving the files');
+                logger_1.default.info('References changed successfully');
+                logger_1.default.info('Moving the files');
                 fs_extra.copySync(_this.source, _this.destination);
-                winston.info('Files copied successfully');
-                winston.info('Deleting old files');
+                logger_1.default.info('Files copied successfully');
+                logger_1.default.info('Deleting old files');
                 fs_extra.removeSync(_this.source);
-                winston.info('Old files deleted successfully');
+                logger_1.default.info('Old files deleted successfully');
                 process.exit(0);
             }
             catch (e) {
-                console.log(e);
-                console.log("Failed to process your request");
+                logger_1.default.error(e);
+                logger_1.default.error("Failed to process your request");
                 process.exit(-1);
             }
         };

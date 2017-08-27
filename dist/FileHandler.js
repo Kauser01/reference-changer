@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var winston = require("winston");
 var path = require("path");
 var fs = require("fs");
+var logger_1 = require("./logger");
 var posixPath = path.posix;
 var FileHandler = (function () {
     function FileHandler(_filePath) {
@@ -81,7 +81,7 @@ var FileHandler = (function () {
             }
             var info = this.isValidReference(position, format.actualPath, format.searchString);
             if (info.isValid) {
-                winston.info("Replacing " + info.replacingString + " with " + format.replaceString);
+                logger_1.default.info("Replacing " + info.replacingString + " with " + format.replaceString);
                 this._fileContent = this._fileContent.substring(0, info.startingIndex + 1) + format.replaceString + this._fileContent.substring(info.endingIndex);
                 this.shouldSave = true;
             }
@@ -91,10 +91,10 @@ var FileHandler = (function () {
     FileHandler.prototype.saveFile = function () {
         if (this.shouldSave) {
             fs.writeFileSync(this._filePath, this._fileContent);
-            winston.info('File saved successfully');
+            logger_1.default.info('File saved successfully');
         }
         else {
-            winston.info('No need to save the file as no content updated');
+            logger_1.default.info('No need to save the file as no content updated');
         }
     };
     return FileHandler;
