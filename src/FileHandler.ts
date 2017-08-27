@@ -20,13 +20,9 @@ export interface PossibleFormat {
 
 export interface IFileHandler {
   filePath(): string;
-  nameWithExtension(): string;
-  nameWithOutExtension(): string;
   getPossibleNameFormats(searchFilePath: string): PossibleFormat[];
   getFileContent(): string;
   updateFileContent(format: PossibleFormat): void;
-  updateFileContent1(currentTargetPath: string, source: string, destination: string, name: string): void;
-  updateTargetFileContent(refernceFilePath: string, source: string, destination: string, name: string): void;
   saveFile(): void;
 }
 
@@ -42,11 +38,11 @@ export class FileHandler implements IFileHandler {
     return this._filePath;
   }
 
-  public nameWithExtension(): string {
+  private nameWithExtension(): string {
     return posixPath.basename(this._filePath);
   }
 
-  public nameWithOutExtension(): string {
+  private nameWithOutExtension(): string {
     let extension = posixPath.extname(this._filePath);
     return posixPath.basename(this._filePath).replace(extension, "");
   }
@@ -159,69 +155,6 @@ export class FileHandler implements IFileHandler {
 
   private getPosition(name: string, count: number): number {
     return this._fileContent.split(name, count).join(name).length;
-  }
-
-  private getRelativePath(source: string, destination: string, name: string): string {
-    let sourceLocation = source.substr(0, source.lastIndexOf("/"));
-    let destinationLocation = destination.substr(0, destination.lastIndexOf("/"));
-    let relativePath = posixPath.relative(sourceLocation, destinationLocation);
-    relativePath += destination.substr(destination.lastIndexOf("/"));
-    if (!posixPath.extname(name))
-      relativePath = relativePath.replace(posixPath.extname(relativePath), "");
-    return relativePath;
-  }
-
-  private updateTargetFileReferenceAt(index: number, currentTargetPath: string, source: string, destination: string, name: string) {
-    let validationResponse = this.isValidReference(index, currentTargetPath, name);
-    if (validationResponse.isValid) {
-      currentTargetPath = currentTargetPath.replace(source, "");
-      currentTargetPath = destination + currentTargetPath;
-      currentTargetPath = this.getRelativePath(this._filePath, currentTargetPath, name);
-      if (currentTargetPath[0] != '.') {
-        currentTargetPath = "./" + currentTargetPath;
-      }
-      this._fileContent = this._fileContent.substring(0, validationResponse.startingIndex + 1) + currentTargetPath + this._fileContent.substring(validationResponse.endingIndex);
-    }
-  }
-
-  private updateSearchFileReferenceAt(index: number, refernceFilePath: string, source: string, destination: string, name: string) {
-    let validationResponse = this.isValidReference(index, refernceFilePath, name);
-    if (validationResponse.isValid) {
-      let currentTargetPath = this._filePath;
-      currentTargetPath = currentTargetPath.replace(source, "");
-      currentTargetPath = destination + currentTargetPath;
-      currentTargetPath = this.getRelativePath(currentTargetPath, refernceFilePath, name);
-      if (currentTargetPath[0] != '.') {
-        currentTargetPath = "./" + currentTargetPath;
-      }
-      this._fileContent = this._fileContent.substring(0, validationResponse.startingIndex + 1) + currentTargetPath + this._fileContent.substring(validationResponse.endingIndex);
-    }
-  }
-
-  public updateFileContent1(currentTargetPath: string, source: string, destination: string, name: string): void {
-    let count = 1;
-    let position = 0;
-    while (position < this._fileContent.length) {
-      position = this.getPosition(name, count);
-      if (position === this._fileContent.length) {
-        break;
-      }
-      this.updateTargetFileReferenceAt(position, currentTargetPath, source, destination, name);
-      count++;
-    }
-  }
-
-  public updateTargetFileContent(refernceFilePath: string, source: string, destination: string, name: string): void {
-    let count = 1;
-    let position = 0;
-    while (position < this._fileContent.length) {
-      position = this.getPosition(name, count);
-      if (position === this._fileContent.length) {
-        break;
-      }
-      this.updateSearchFileReferenceAt(position, refernceFilePath, source, destination, name);
-      count++;
-    }
   }
 
   public updateFileContent(format: PossibleFormat): void {
