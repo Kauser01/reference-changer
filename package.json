@@ -28,11 +28,13 @@
   },
   "license": "ISC",
   "dependencies": {
-    "fs-extra": "^4.0.0"
+    "fs-extra": "^4.0.0",
+    "winston": "^2.3.1"
   },
   "devDependencies": {
     "@types/fs-extra": "^4.0.0",
-    "@types/node": "^8.0.15"
+    "@types/node": "^8.0.15",
+    "@types/winston": "^2.3.4"
   },
   "repository": {
     "type": "git",

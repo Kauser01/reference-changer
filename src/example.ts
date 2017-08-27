@@ -1,5 +1,5 @@
-import ReferenceChanger from "./index";
+import ReferenceChanger from "./ReferenceChanger";
 
-let handler = new ReferenceChanger(process.cwd(), "./src/index.ts", "./src/index1.ts");
+let handler = new ReferenceChanger("C:/test", "./b/a/b", "./aa");
 
-handler.change_copy();
+handler.changeReference();

@@ -1,11 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+var winston = require("winston");
 var path = require("path");
 var fs = require("fs");
 var posixPath = path.posix;
 var FileHandler = (function () {
     function FileHandler(_filePath) {
         this._filePath = _filePath;
+        this.shouldSave = false;
+        this.getFileContent();
     }
     FileHandler.prototype.filePath = function () {
         return this._filePath;
@@ -21,6 +24,62 @@ var FileHandler = (function () {
         if (!this._fileContent)
             this._fileContent = fs.readFileSync(this._filePath, "utf8");
         return this._fileContent;
+    };
+    FileHandler.prototype.getPossibleNameFormats = function (searchFilePath) {
+        var possibleFormat = [];
+        possibleFormat.push({
+            isFile: true,
+            searchString: this.nameWithExtension(),
+            actualPath: this.filePath()
+        });
+        possibleFormat.push({
+            isFile: true,
+            searchString: this.nameWithOutExtension(),
+            actualPath: this.filePath()
+        });
+        if (this.nameWithOutExtension() === "index") {
+            var folderStack = this._filePath.split('/');
+            possibleFormat.push({
+                isFile: false,
+                searchString: folderStack[folderStack.length - 2],
+                actualPath: this.filePath()
+            });
+            var currentFilePathWithoutName = this.filePath().replace(this.nameWithExtension(), '');
+            var targetFilePathWithoutName = searchFilePath.substring(0, searchFilePath.lastIndexOf('/'));
+            var relativePath = posixPath.relative(targetFilePathWithoutName, currentFilePathWithoutName);
+            possibleFormat.push({
+                isFile: false,
+                searchString: relativePath ? "./" + relativePath : './',
+                actualPath: this.filePath()
+            });
+            if (relativePath.match('/$')) {
+                possibleFormat.push({
+                    isFile: false,
+                    searchString: "./" + relativePath.substring(0, relativePath.length - 1),
+                    actualPath: this.filePath()
+                });
+            }
+            else if (relativePath !== '/' && relativePath !== '') {
+                possibleFormat.push({
+                    isFile: false,
+                    searchString: "./" + relativePath + "/",
+                    actualPath: this.filePath()
+                });
+            }
+            if (relativePath.match('^..')) {
+                possibleFormat.push({
+                    isFile: false,
+                    searchString: relativePath,
+                    actualPath: this.filePath()
+                });
+                possibleFormat.push({
+                    isFile: false,
+                    searchString: relativePath + "/",
+                    actualPath: this.filePath()
+                });
+            }
+        }
+        return possibleFormat;
     };
     FileHandler.prototype.isValidReference = function (index, currentTargetPath, name) {
         var endingIndex = index + name.length;
@@ -40,14 +99,29 @@ var FileHandler = (function () {
                 return {
                     isValid: true,
                     startingIndex: startingIndex,
-                    endingIndex: endingIndex
+                    endingIndex: endingIndex,
+                    replacingString: replaceString
                 };
+            }
+            else {
+                var fileWithoutExtension = currentTargetPath.replace(posixPath.extname(currentTargetPath), '');
+                if (fileWithoutExtension.match('index$')) {
+                    if (pathInFile + 'index' === fileWithoutExtension || pathInFile + '/index' === fileWithoutExtension) {
+                        return {
+                            isValid: true,
+                            startingIndex: startingIndex,
+                            endingIndex: endingIndex,
+                            replacingString: replaceString
+                        };
+                    }
+                }
             }
         }
         return {
             isValid: false,
             startingIndex: -1,
-            endingIndex: -1
+            endingIndex: -1,
+            replacingString: ''
         };
     };
     FileHandler.prototype.getPosition = function (name, count) {
@@ -87,7 +161,7 @@ var FileHandler = (function () {
             this._fileContent = this._fileContent.substring(0, validationResponse.startingIndex + 1) + currentTargetPath + this._fileContent.substring(validationResponse.endingIndex);
         }
     };
-    FileHandler.prototype.updateFileContent = function (currentTargetPath, source, destination, name) {
+    FileHandler.prototype.updateFileContent1 = function (currentTargetPath, source, destination, name) {
         var count = 1;
         var position = 0;
         while (position < this._fileContent.length) {
@@ -111,8 +185,31 @@ var FileHandler = (function () {
             count++;
         }
     };
+    FileHandler.prototype.updateFileContent = function (format) {
+        var count = 1;
+        var position = 0;
+        while (position < this._fileContent.length) {
+            position = this.getPosition(format.searchString, count);
+            if (position === this._fileContent.length) {
+                break;
+            }
+            var info = this.isValidReference(position, format.actualPath, format.searchString);
+            if (info.isValid) {
+                winston.info("Replacing " + info.replacingString + " with " + format.replaceString);
+                this._fileContent = this._fileContent.substring(0, info.startingIndex + 1) + format.replaceString + this._fileContent.substring(info.endingIndex);
+                this.shouldSave = true;
+            }
+            count++;
+        }
+    };
     FileHandler.prototype.saveFile = function () {
-        fs.writeFileSync(this._filePath, this._fileContent);
+        if (this.shouldSave) {
+            fs.writeFileSync(this._filePath, this._fileContent);
+            winston.info('File saved successfully');
+        }
+        else {
+            winston.info('No need to save the file as no content updated');
+        }
     };
     return FileHandler;
 }());
