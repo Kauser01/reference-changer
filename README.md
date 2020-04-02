@@ -4,7 +4,7 @@
 
 `Reference changer` is a command-line utility that helps in moving folders/files from one location to another. It automatically changes the references in the project repository
 
-# Install
+# Installation Step
 
 With [node.js](http://nodejs.org/) and [npm](http://github.com/isaacs/npm):
 
